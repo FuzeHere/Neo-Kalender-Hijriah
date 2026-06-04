@@ -1,10 +1,14 @@
-export function getHijriDateParts(date) {
+export function getHijriDateParts(date, adjustment = 0) {
+  const adjustedDate = new Date(date);
+  if (adjustment !== 0) {
+    adjustedDate.setDate(adjustedDate.getDate() + adjustment);
+  }
   const formatter = new Intl.DateTimeFormat('en-US-u-ca-islamic', {
     day: 'numeric',
     month: 'numeric',
     year: 'numeric'
   });
-  const parts = formatter.formatToParts(date);
+  const parts = formatter.formatToParts(adjustedDate);
   let day = 1, month = 1, year = 1445;
   parts.forEach(p => {
     if (p.type === 'day') day = parseInt(p.value, 10);
@@ -27,7 +31,7 @@ export function getHijriMonthName(monthIndex) {
   return HIJRI_MONTHS[monthIndex - 1] || "";
 }
 
-export function formatHijriDate(date) {
-  const { day, month, year } = getHijriDateParts(date);
+export function formatHijriDate(date, adjustment = 0) {
+  const { day, month, year } = getHijriDateParts(date, adjustment);
   return `${day} ${getHijriMonthName(month)} ${year} H`;
 }

@@ -24,4 +24,17 @@ describe('utils.js', () => {
     expect(typeof formatted).toBe('string');
     expect(formatted).toMatch(/\d+\s+[\w\s']+\s+\d+\s+H/);
   });
+
+  it('should adjust Hijri date parts based on adjustment parameter', () => {
+    const baseDate = new Date('2024-03-12T12:00:00Z');
+    const normalParts = getHijriDateParts(baseDate, 0);
+    const adjustedPlusOne = getHijriDateParts(baseDate, 1);
+    
+    // Day should be different when adjusted
+    expect(adjustedPlusOne.day).not.toBe(normalParts.day);
+    
+    const formattedNormal = formatHijriDate(baseDate, 0);
+    const formattedAdjusted = formatHijriDate(baseDate, 1);
+    expect(formattedNormal).not.toBe(formattedAdjusted);
+  });
 });

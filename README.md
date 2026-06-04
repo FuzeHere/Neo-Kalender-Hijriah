@@ -4,7 +4,7 @@
 
 **Kalender Islami Hijriah** dengan antarmuka modern, estetik, dan informatif. Aplikasi ini dirancang untuk memudahkan umat muslim memantau tanggal Hijriah sekaligus mendapatkan jadwal akurat mengenai puasa sunnah, puasa wajib, dan anjuran amalan ibadah harian beserta dalil hadits pendukungnya.
 
-> 🌐 **Live Demo:** [https://neo-kalender-hijriah.vercel.app](https://neo-kalender-hijriah.vercel.app) *(Ganti dengan tautan Vercel Anda saat sudah di-deploy)*
+> 🌐 **Live Demo:** [https://neo-kalender-hijriah.vercel.app](https://neo-kalender-hijriah.vercel.app)
 
 ---
 
@@ -12,12 +12,16 @@
 
 - **Deteksi Hari Waktu Nyata:** Mengambil waktu perangkat pengguna untuk secara otomatis menyorot hari dan tanggal saat ini.
 - **Kalkulasi Kalender Hijriah:** Konversi otomatis kalender Gregorian ke kalender Islam (Hijriah) tanpa bergantung pada layanan API eksternal yang lambat.
-- **Sistem Pengingat Puasa & Ibadah:**
-  - Puasa Wajib (Ramadhan).
-  - Puasa Sunnah (Senin-Kamis, Ayyamul Bidh, Asyura, Tasu'a, Arafah, Tarwiyah, Syawal).
-  - Pemblokiran hari-hari diharamkan puasa (Idul Fitri, Idul Adha, dan Hari Tasyrik).
-  - Amalan Harian (Dhuha, Tahajjud, Witir, Amalan khusus Jumat).
-- **Desain Modern (Glassmorphism):** UI dirancang khusus dengan Vanilla CSS murni yang menawarkan pengalaman premium, _dark mode_ elegan, dan efek _hover_ animasi yang mulus. Sangat responsif di Mobile, Tablet, dan Desktop.
+- **Koreksi Tanggal Hijriah (Manual Adjustment):** Fitur penyesuaian penanggalan Hijriah sebesar -2 hingga +2 hari untuk sinkronisasi dengan hasil rukyatul hilal lokal, tersimpan secara persisten di `localStorage`.
+- **Navigasi Cepat Dropdown:** Mempermudah pencarian tanggal dan bulan tertentu melalui dropdown Bulan dan Tahun secara langsung.
+- **Widget Jadwal Sholat & Countdown Real-Time:** 
+  - Deteksi lokasi otomatis via Geolocation API (dengan fallback Jakarta) untuk mengambil jadwal sholat akurat dari API Aladhan.
+  - Menampilkan countdown dinamis (detik demi detik) ke waktu sholat berikutnya.
+- **Tracker Amal Harian & Progress Bar:**
+  - Sistem checklist amalan harian (shalat fardhu, ibadah sunnah, dan puasa hari berjalan) yang disimpan di `localStorage` per tanggal.
+  - Dilengkapi *progress bar* interaktif untuk memantau persentase penyelesaian amalan harian.
+- **Navigasi Tab Sidebar:** Desain sidebar baru yang rapi menggunakan sistem tab (**Amalan**, **Sholat**, **Puasa**) untuk menghemat ruang, mencegah scrolling berlebih, dan meningkatkan kejelasan UI.
+- **Sel Kalender Persegi & Rapi:** Sel tanggal kalender presisi tinggi (`aspect-ratio: 1`) dengan penempatan rapi tanggal Gregorian dan Hijriah di baris atas sel (`.day-cell-top`).
 - **Dilengkapi Dalil:** Setiap rekomendasi ibadah dilengkapi dengan kutipan hadits sahih (Bukhari, Muslim, Tirmidzi, dll).
 
 ---
