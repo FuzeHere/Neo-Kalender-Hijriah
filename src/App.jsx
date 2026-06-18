@@ -1,22 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, startOfWeek, endOfWeek } from 'date-fns';
-import { ChevronLeft, ChevronRight, BookOpen, AlertCircle, Bell, BellOff, Settings, CheckSquare, Compass } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, AlertCircle, Settings, CheckSquare, Compass, Bell, BellOff } from 'lucide-react';
 import { getHijriDateParts, formatHijriDate } from './utils';
 import { FASTS, IBADAH, isForbiddenFastingDay, getIslamicEvent } from './data';
-import { useNotification } from './useNotification';
-import PrayerTimesCard from './components/PrayerTimesCard';
-import EventCard from './components/EventCard';
 import SettingsModal from './SettingsModal';
+import PrayerTimesWidget from './PrayerTimesWidget';
+import EventCard from './components/EventCard';
+import { useNotification } from './useNotification';
 import './App.css';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [activeFasts, setActiveFasts] = useState([]);
-  const [activeIbadah, setActiveIbadah] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const { enabled, toggleNotification, sendTestNotification, isSupported, permission } = useNotification();
-
   const [activeTab, setActiveTab] = useState('tracker'); // 'tracker', 'sholat', 'puasa'
   
   // Settings & Adjustments state
@@ -32,18 +27,7 @@ function App() {
     return saved ? JSON.parse(saved) : {};
   });
 
-  useEffect(() => {
-    // Determine fasts, ibadah and events for selected date
-    const hijriParts = getHijriDateParts(selectedDate, hijriAdjustment);
-    
-    const fastsToday = FASTS.filter(fast => fast.check(selectedDate, hijriParts));
-    const ibadahToday = IBADAH.filter(ibadah => ibadah.check ? ibadah.check(selectedDate, hijriParts) : true);
-    const event = getIslamicEvent(hijriParts);
-
-    setActiveFasts(fastsToday);
-    setActiveIbadah(ibadahToday);
-    setSelectedEvent(event);
-  }, [selectedDate, hijriAdjustment]);
+  const { enabled, toggleNotification, sendTestNotification, isSupported, permission } = useNotification();
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -58,7 +42,13 @@ function App() {
     end: endDate
   });
 
-  const isForbidden = isForbiddenFastingDay(getHijriDateParts(selectedDate, hijriAdjustment));
+  // Determine fasts, ibadah, and event for selected date dynamically at render time
+  const hijriParts = getHijriDateParts(selectedDate, hijriAdjustment);
+  const activeFasts = FASTS.filter(fast => fast.check(selectedDate, hijriParts));
+  const activeIbadah = IBADAH.filter(ibadah => ibadah.check ? ibadah.check(selectedDate, hijriParts) : true);
+  const selectedEvent = getIslamicEvent(hijriParts);
+
+  const isForbidden = isForbiddenFastingDay(hijriParts);
 
   // Date picker lists
   const monthsList = [
@@ -146,6 +136,7 @@ function App() {
   const handleNotificationToggle = () => {
     toggleNotification();
     if (!enabled && permission === 'granted') {
+      // Send test notification when first enabling
       setTimeout(sendTestNotification, 500);
     }
   };
@@ -157,27 +148,23 @@ function App() {
           <h1>🌙 Kalender Hijriah</h1>
           <p>Panduan Puasa, Ibadah & Jadwal Shalat</p>
         </div>
-        <div className="header-actions">
-          {isSupported && (
+        {isSupported && (
+          <div className="header-actions">
             <button
               className={`notification-toggle ${enabled ? 'active' : ''}`}
               onClick={handleNotificationToggle}
-              title={enabled ? 'Notifikasi pengingat puasa aktif' : 'Aktifkan pengingat puasa sunnah'}
+              title={
+                enabled 
+                  ? 'Notifikasi pengingat puasa aktif' 
+                  : 'Aktifkan pengingat puasa sunnah'
+              }
               id="notification-toggle"
             >
               {enabled ? <Bell size={20} /> : <BellOff size={20} />}
               {enabled && <span className="notif-dot" />}
             </button>
-          )}
-          <button 
-            className="icon-button settings-toggle-btn" 
-            onClick={() => setIsSettingsOpen(true)} 
-            title="Pengaturan"
-            id="settings-btn"
-          >
-            <Settings size={20} />
-          </button>
-        </div>
+          </div>
+        )}
       </header>
 
       <main className="calendar-section">
@@ -205,16 +192,21 @@ function App() {
             </div>
             <p className="hijri-month-header">{formatHijriDate(currentDate, hijriAdjustment)}</p>
           </div>
-          
           <div className="nav-buttons">
-            <button className="icon-button" onClick={prevMonth} id="prev-month-btn">
-              <ChevronLeft size={22} />
+            <button className="icon-button" onClick={prevMonth} id="prev-month-btn" title="Bulan Sebelumnya">
+              <ChevronLeft size={20} />
             </button>
-            <button className="icon-button" onClick={() => { setCurrentDate(new Date()); setSelectedDate(new Date()); }} id="today-btn">
-              <span style={{fontSize: '0.75rem', fontWeight: 600}}>HARI INI</span>
+            <button className="icon-button today-btn" onClick={() => {
+              setCurrentDate(new Date());
+              setSelectedDate(new Date());
+            }} id="today-btn" title="Hari Ini">
+              <span style={{fontSize: '0.75rem', fontWeight: 700}}>HARI INI</span>
             </button>
-            <button className="icon-button" onClick={nextMonth} id="next-month-btn">
-              <ChevronRight size={22} />
+            <button className="icon-button" onClick={nextMonth} id="next-month-btn" title="Bulan Selanjutnya">
+              <ChevronRight size={20} />
+            </button>
+            <button className="icon-button settings-toggle-btn" onClick={() => setIsSettingsOpen(true)} title="Pengaturan">
+              <Settings size={20} />
             </button>
           </div>
         </div>
@@ -231,10 +223,10 @@ function App() {
 
         <div className="days-grid">
           {days.map((day, idx) => {
-            const hijriParts = getHijriDateParts(day, hijriAdjustment);
-            const isForbiddenDay = isForbiddenFastingDay(hijriParts);
-            const dayFasts = FASTS.filter(f => f.check(day, hijriParts));
-            const dayEvent = getIslamicEvent(hijriParts);
+            const dayHijriParts = getHijriDateParts(day, hijriAdjustment);
+            const isForbiddenDay = isForbiddenFastingDay(dayHijriParts);
+            const dayFasts = FASTS.filter(f => f.check(day, dayHijriParts));
+            const dayEvent = getIslamicEvent(dayHijriParts);
             
             return (
               <div
@@ -248,7 +240,7 @@ function App() {
               >
                 <div className="day-cell-top">
                   <span className="gregorian-day">{format(day, "d")}</span>
-                  <span className="hijri-day">{hijriParts.day}</span>
+                  <span className="hijri-day">{dayHijriParts.day}</span>
                 </div>
                 {dayEvent && <span className="event-emoji">{dayEvent.emoji}</span>}
                 <div className="indicators">
@@ -293,13 +285,13 @@ function App() {
           </button>
         </div>
 
-        <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
+        <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
           {activeTab === 'tracker' && (
             <>
               {/* Tracker Amal Harian */}
               <div className="card tracker-card">
                 <h3 className="card-title">
-                  <CheckSquare size={22} />
+                  <CheckSquare size={24} />
                   Tracker Amal Harian
                 </h3>
 
@@ -346,7 +338,7 @@ function App() {
               {/* Amalan & Ibadah */}
               <div className="card">
                 <h3 className="card-title">
-                  <BookOpen size={22} />
+                  <BookOpen size={24} />
                   Amalan &amp; Ibadah
                 </h3>
                 <div className="item-list">
@@ -369,12 +361,11 @@ function App() {
           )}
 
           {activeTab === 'sholat' && (
-            <PrayerTimesCard />
+            <PrayerTimesWidget />
           )}
 
           {activeTab === 'puasa' && (
             <>
-              {/* Islamic Event Card (only shows when an event is on selected date) */}
               {selectedEvent && (
                 <EventCard event={selectedEvent} selectedDate={selectedDate} />
               )}
@@ -382,13 +373,13 @@ function App() {
               {/* Puasa Hari Ini */}
               <div className="card">
                 <h3 className="card-title">
-                  <AlertCircle size={22} />
+                  <AlertCircle size={24} />
                   Puasa Hari Ini
                 </h3>
                 
-                <div className="selected-date-info">
+                <div className="selected-date-info" style={{marginBottom: '1rem'}}>
                   <strong>{format(selectedDate, "eeee, d MMMM yyyy")}</strong><br/>
-                  <span style={{color: 'var(--primary)', fontSize: '0.9rem'}}>{formatHijriDate(selectedDate, hijriAdjustment)}</span>
+                  <span style={{color: 'var(--primary)'}}>{formatHijriDate(selectedDate, hijriAdjustment)}</span>
                 </div>
 
                 {isForbidden ? (

@@ -379,8 +379,14 @@
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .card-title {
@@ -487,107 +493,130 @@
 }
 
 /* ========================= */
-/* PRAYER TIMES CARD         */
+/* PRAYER TIMES WIDGET & CARD */
 /* ========================= */
-.prayer-times-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+.prayer-card {
+  position: relative;
 }
 
-.prayer-time-row {
+.prayer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.6rem 0.85rem;
-  border-radius: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.refresh-btn {
   background: var(--surface);
-  border: 1px solid transparent;
-  transition: all 0.25s ease;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.prayer-time-row:hover {
-  border-color: var(--border);
-}
-
-.prayer-time-row.is-next {
-  background: linear-gradient(135deg, rgba(147, 129, 255, 0.1), rgba(184, 184, 255, 0.12));
+.refresh-btn:hover:not(:disabled) {
+  background: var(--surface-hover);
+  color: var(--primary);
   border-color: var(--primary);
 }
 
-.prayer-time-name {
-  font-weight: 600;
-  font-size: 0.82rem;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.refresh-btn.loading svg {
+  animation: spin 1s linear infinite;
+}
+
+.location-info {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
   color: var(--text-muted);
+  margin-bottom: 1rem;
 }
 
-.prayer-time-row.is-next .prayer-time-name {
-  color: var(--primary);
+.prayer-error-msg {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
 }
 
-.prayer-time-value {
-  font-weight: 700;
-  font-size: 0.92rem;
-  font-family: 'Outfit', sans-serif;
-  color: var(--text-main);
-}
-
-.prayer-time-row.is-next .prayer-time-value {
-  color: var(--primary);
-}
-
-.countdown-container {
-  margin-top: 0.85rem;
-  padding: 0.85rem;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+.next-prayer-countdown {
+  background: linear-gradient(135deg, rgba(147, 129, 255, 0.15), rgba(184, 184, 255, 0.05));
+  border: 1px solid rgba(147, 129, 255, 0.2);
   border-radius: 16px;
+  padding: 1rem;
   text-align: center;
-  color: #fff;
+  margin-bottom: 1.25rem;
 }
 
-.countdown-label {
-  font-size: 0.78rem;
-  opacity: 0.85;
-  margin-bottom: 0.25rem;
+.next-title {
+  font-size: 0.85rem;
+  color: var(--primary);
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
 }
 
-.countdown-time {
-  font-size: 1.35rem;
-  font-weight: 700;
+.countdown-timer {
   font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-main);
   letter-spacing: 0.02em;
 }
 
-.prayer-location {
+.prayer-times-grid {
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prayer-time-item {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.78rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.prayer-time-item.is-next-active {
+  background: rgba(147, 129, 255, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 12px rgba(147, 129, 255, 0.1);
+}
+
+.prayer-name {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.prayer-time {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 0.85rem;
 }
 
-.prayer-loading,
-.prayer-error {
-  text-align: center;
-  padding: 1.5rem 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
-.prayer-error {
-  color: var(--danger);
-}
-
-.loading-pulse {
-  display: inline-block;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+.prayer-time-item.is-next-active .prayer-time {
+  color: var(--primary);
 }
 
 /* ========================= */
@@ -796,8 +825,14 @@
 }
 
 @keyframes scaleUp {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .modal-header {
@@ -929,31 +964,33 @@
 @media (max-width: 1024px) {
   .app-container {
     grid-template-columns: 1fr;
-    padding: 1rem;
+    padding: 1.5rem;
   }
-  
+
   .details-section {
     max-height: none;
     overflow-y: visible;
   }
-  
+
   .card {
     flex: 1;
     min-width: 280px;
   }
 
-  .header-actions {
-    position: static;
-    transform: none;
+  .app-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    width: 100%;
+    margin-bottom: 1.5rem;
   }
 
-  .app-header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    width: 100%;
-    margin-bottom: 1rem;
+  .header-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
   }
 }
 
@@ -966,23 +1003,37 @@
     padding: 1rem;
     border-radius: 20px;
   }
-  
+
   .day-cell {
     min-height: 65px;
     padding: 0.4rem;
     border-radius: 12px;
   }
-  
+
   .gregorian-day {
     font-size: 0.95rem;
   }
-  
+
   .hijri-day {
     font-size: 0.65rem;
   }
-  
+
   .app-header h1 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    margin-left: 3rem;
+    margin-right: 3rem;
+  }
+
+  .app-header p {
+    font-size: 0.9rem;
+    padding: 0 0.5rem;
+  }
+
+  .header-actions {
+    position: absolute;
+    right: 0;
+    top: 4px;
+    transform: none;
   }
 
   .event-emoji {

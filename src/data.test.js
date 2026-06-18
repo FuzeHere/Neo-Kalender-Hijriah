@@ -86,4 +86,3 @@ describe('data.js - Islamic Events', () => {
     expect(event).toBeNull();
   });
 });
-
