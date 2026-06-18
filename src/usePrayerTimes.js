@@ -12,10 +12,10 @@ const PRAYER_NAMES = {
 
 const PRAYER_ORDER = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
-// Fallback: Jakarta, Indonesia
-const DEFAULT_LAT = -6.2088;
-const DEFAULT_LNG = 106.8456;
-const DEFAULT_CITY = 'Jakarta';
+// Fallback: Makassar, Indonesia
+const DEFAULT_LAT = -5.1477;
+const DEFAULT_LNG = 119.4327;
+const DEFAULT_CITY = 'Makassar';
 
 function parseTimeString(timeStr) {
   const [hours, minutes] = timeStr.split(':').map(Number);
@@ -45,7 +45,7 @@ export function usePrayerTimes() {
     try {
       const dateStr = format(new Date(), 'dd-MM-yyyy');
       const cacheKey = `prayer_${dateStr}_${lat.toFixed(2)}_${lng.toFixed(2)}`;
-      
+
       // Check sessionStorage cache
       const cached = sessionStorage.getItem(cacheKey);
       if (cached) {
@@ -59,22 +59,22 @@ export function usePrayerTimes() {
       const res = await fetch(
         `https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lng}&method=20`
       );
-      
+
       if (!res.ok) throw new Error('Gagal mengambil jadwal shalat');
-      
+
       const data = await res.json();
       const timings = {};
-      
+
       PRAYER_ORDER.forEach(key => {
         // Remove timezone info like " (WIB)"
         timings[key] = data.data.timings[key].split(' ')[0];
       });
 
       const location = data.data.meta?.timezone?.split('/')?.pop()?.replace('_', ' ') || 'Lokasi Anda';
-      
+
       // Cache result
       sessionStorage.setItem(cacheKey, JSON.stringify({ timings, location }));
-      
+
       setPrayerTimes(timings);
       setLocationName(location);
       setLoading(false);
@@ -110,7 +110,7 @@ export function usePrayerTimes() {
 
     const updateCountdown = () => {
       const now = new Date();
-      
+
       for (const key of PRAYER_ORDER) {
         const prayerTime = parseTimeString(prayerTimes[key]);
         if (prayerTime > now) {
@@ -119,7 +119,7 @@ export function usePrayerTimes() {
           return;
         }
       }
-      
+
       // All prayers passed for today → next is Fajr tomorrow
       setNextPrayer('Fajr');
       const tomorrowFajr = parseTimeString(prayerTimes.Fajr);
