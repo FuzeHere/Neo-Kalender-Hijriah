@@ -37,6 +37,7 @@ body {
     radial-gradient(at 50% 50%, rgba(147, 129, 255, 0.04) 0px, transparent 70%);
   background-attachment: fixed;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 * {
