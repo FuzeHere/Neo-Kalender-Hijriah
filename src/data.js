@@ -118,3 +118,20 @@ export const IBADAH = [
     check: (gregorianDate) => gregorianDate.getDay() === 5
   }
 ];
+
+export const ISLAMIC_EVENTS = [
+  { id: 'tahun-baru-hijriah', name: 'Tahun Baru Hijriah', month: 1, day: 1, emoji: '🌙', description: 'Awal tahun baru dalam penanggalan Islam (Hijriah).' },
+  { id: 'asyura-event', name: 'Hari Asyura', month: 1, day: 10, emoji: '📿', description: 'Hari ke-10 Muharram, hari bersejarah dalam Islam.' },
+  { id: 'maulid-nabi', name: 'Maulid Nabi Muhammad ﷺ', month: 3, day: 12, emoji: '🕌', description: 'Peringatan kelahiran Nabi Muhammad Shallallahu Alaihi Wasallam.' },
+  { id: 'isra-miraj', name: "Isra Mi'raj", month: 7, day: 27, emoji: '✨', description: "Peringatan perjalanan malam Rasulullah ﷺ dari Masjidil Haram ke Masjidil Aqsha dan naik ke langit." },
+  { id: 'nisfu-syaban', name: "Nisfu Sya'ban", month: 8, day: 15, emoji: '🌕', description: "Malam pertengahan bulan Sya'ban, dianjurkan memperbanyak ibadah." },
+  { id: 'awal-ramadhan', name: 'Awal Ramadhan', month: 9, day: 1, emoji: '🌙', description: 'Hari pertama bulan suci Ramadhan, dimulainya puasa wajib.' },
+  { id: 'nuzulul-quran', name: 'Nuzulul Quran', month: 9, day: 17, emoji: '📖', description: 'Peringatan turunnya Al-Quran pertama kali kepada Nabi Muhammad ﷺ.' },
+  { id: 'lailatul-qadr', name: 'Lailatul Qadr (perkiraan)', month: 9, day: 27, emoji: '⭐', description: 'Malam yang lebih baik dari seribu bulan (QS. Al-Qadr).' },
+  { id: 'idul-fitri', name: 'Idul Fitri', month: 10, day: 1, emoji: '🎉', description: 'Hari raya umat Islam setelah sebulan berpuasa Ramadhan.' },
+  { id: 'idul-adha', name: 'Idul Adha', month: 12, day: 10, emoji: '🐑', description: 'Hari raya kurban, puncak ibadah haji di Tanah Suci.' },
+];
+
+export function getIslamicEvent(hijriParts) {
+  return ISLAMIC_EVENTS.find(e => e.month === hijriParts.month && e.day === hijriParts.day) || null;
+}

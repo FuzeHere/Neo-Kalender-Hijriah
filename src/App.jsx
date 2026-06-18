@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, startOfWeek, endOfWeek } from 'date-fns';
-import { ChevronLeft, ChevronRight, Moon, BookOpen, AlertCircle } from 'lucide-react';
-import { getHijriDateParts, formatHijriDate, getHijriMonthName } from './utils';
-import { FASTS, IBADAH, isForbiddenFastingDay } from './data';
+import { ChevronLeft, ChevronRight, BookOpen, AlertCircle, Bell, BellOff } from 'lucide-react';
+import { getHijriDateParts, formatHijriDate } from './utils';
+import { FASTS, IBADAH, isForbiddenFastingDay, getIslamicEvent } from './data';
+import { useNotification } from './useNotification';
+import PrayerTimesCard from './components/PrayerTimesCard';
+import EventCard from './components/EventCard';
 import './App.css';
 
 function App() {
@@ -10,6 +13,8 @@ function App() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeFasts, setActiveFasts] = useState([]);
   const [activeIbadah, setActiveIbadah] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const { enabled, toggleNotification, sendTestNotification, isSupported, permission } = useNotification();
 
   useEffect(() => {
     // Determine fasts and ibadah for selected date
@@ -17,9 +22,11 @@ function App() {
     
     const fastsToday = FASTS.filter(fast => fast.check(selectedDate, hijriParts));
     const ibadahToday = IBADAH.filter(ibadah => ibadah.check ? ibadah.check(selectedDate, hijriParts) : true);
+    const event = getIslamicEvent(hijriParts);
 
     setActiveFasts(fastsToday);
     setActiveIbadah(ibadahToday);
+    setSelectedEvent(event);
   }, [selectedDate]);
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -38,11 +45,38 @@ function App() {
 
   const isForbidden = isForbiddenFastingDay(getHijriDateParts(selectedDate));
 
+  const handleNotificationToggle = () => {
+    toggleNotification();
+    if (!enabled && permission === 'granted') {
+      // Send test notification when first enabling
+      setTimeout(sendTestNotification, 500);
+    }
+  };
+
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1>Kalender Hijriah</h1>
-        <p>Panduan Puasa & Ibadah Harian</p>
+        <div>
+          <h1>🌙 Kalender Hijriah</h1>
+          <p>Panduan Puasa, Ibadah & Jadwal Shalat</p>
+        </div>
+        {isSupported && (
+          <div className="header-actions">
+            <button
+              className={`notification-toggle ${enabled ? 'active' : ''}`}
+              onClick={handleNotificationToggle}
+              title={
+                enabled 
+                  ? 'Notifikasi pengingat puasa aktif' 
+                  : 'Aktifkan pengingat puasa sunnah'
+              }
+              id="notification-toggle"
+            >
+              {enabled ? <Bell size={20} /> : <BellOff size={20} />}
+              {enabled && <span className="notif-dot" />}
+            </button>
+          </div>
+        )}
       </header>
 
       <main className="calendar-section">
@@ -52,14 +86,14 @@ function App() {
             <p>{formatHijriDate(currentDate)}</p>
           </div>
           <div className="nav-buttons">
-            <button className="icon-button" onClick={prevMonth}>
-              <ChevronLeft size={24} />
+            <button className="icon-button" onClick={prevMonth} id="prev-month-btn">
+              <ChevronLeft size={22} />
             </button>
-            <button className="icon-button" onClick={() => setCurrentDate(new Date())}>
-              <span style={{fontSize: '0.8rem', fontWeight: 600}}>HARI INI</span>
+            <button className="icon-button" onClick={() => { setCurrentDate(new Date()); setSelectedDate(new Date()); }} id="today-btn">
+              <span style={{fontSize: '0.75rem', fontWeight: 600}}>HARI INI</span>
             </button>
-            <button className="icon-button" onClick={nextMonth}>
-              <ChevronRight size={24} />
+            <button className="icon-button" onClick={nextMonth} id="next-month-btn">
+              <ChevronRight size={22} />
             </button>
           </div>
         </div>
@@ -79,6 +113,7 @@ function App() {
             const hijriParts = getHijriDateParts(day);
             const isForbiddenDay = isForbiddenFastingDay(hijriParts);
             const dayFasts = FASTS.filter(f => f.check(day, hijriParts));
+            const dayEvent = getIslamicEvent(hijriParts);
             
             return (
               <div
@@ -88,11 +123,13 @@ function App() {
                   !isSameMonth(day, monthStart) ? "is-other-month" : ""
                 } ${isToday(day) ? "is-today" : ""} ${
                   isSameDay(day, selectedDate) ? "is-selected" : ""
-                }`}
+                } ${dayEvent ? "has-event" : ""}`}
               >
                 <span className="gregorian-day">{format(day, "d")}</span>
+                {dayEvent && <span className="event-emoji">{dayEvent.emoji}</span>}
                 <span className="hijri-day">{hijriParts.day}</span>
                 <div className="indicators">
+                  {dayEvent && <div className="indicator-dot event" title={dayEvent.name} />}
                   {isForbiddenDay && <div className="indicator-dot forbidden" title="Hari Diharamkan Berpuasa" />}
                   {!isForbiddenDay && dayFasts.map(f => (
                     <div 
@@ -109,15 +146,24 @@ function App() {
       </main>
 
       <aside className="details-section">
+        {/* Prayer Times Card */}
+        <PrayerTimesCard />
+
+        {/* Islamic Event Card (only shows when an event is on selected date) */}
+        {selectedEvent && (
+          <EventCard event={selectedEvent} selectedDate={selectedDate} />
+        )}
+
+        {/* Fasting Card */}
         <div className="card">
           <h3 className="card-title">
-            <AlertCircle size={24} />
+            <AlertCircle size={22} />
             Puasa Hari Ini
           </h3>
           
-          <div className="selected-date-info" style={{marginBottom: '1rem'}}>
+          <div className="selected-date-info">
             <strong>{format(selectedDate, "eeee, d MMMM yyyy")}</strong><br/>
-            <span style={{color: 'var(--primary)'}}>{formatHijriDate(selectedDate)}</span>
+            <span style={{color: 'var(--primary)', fontSize: '0.9rem'}}>{formatHijriDate(selectedDate)}</span>
           </div>
 
           {isForbidden ? (
@@ -147,10 +193,11 @@ function App() {
           )}
         </div>
 
+        {/* Ibadah Card */}
         <div className="card">
           <h3 className="card-title">
-            <BookOpen size={24} />
-            Amalan & Ibadah
+            <BookOpen size={22} />
+            Amalan &amp; Ibadah
           </h3>
           <div className="item-list">
             {activeIbadah.map(ibadah => (

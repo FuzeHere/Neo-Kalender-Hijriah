@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FASTS, IBADAH, isForbiddenFastingDay } from './data';
+import { FASTS, IBADAH, isForbiddenFastingDay, getIslamicEvent } from './data';
 
 describe('data.js - Fasting Rules', () => {
   const findFast = (id) => FASTS.find(f => f.id === id);
@@ -72,3 +72,18 @@ describe('data.js - Ibadah Rules', () => {
     expect(dhuha.check()).toBe(true);
   });
 });
+
+describe('data.js - Islamic Events', () => {
+  it('should return correct event for a specific Hijri date', () => {
+    const event = getIslamicEvent({ day: 10, month: 12 });
+    expect(event).not.toBeNull();
+    expect(event.name).toBe('Idul Adha');
+    expect(event.emoji).toBe('🐑');
+  });
+
+  it('should return null for dates without events', () => {
+    const event = getIslamicEvent({ day: 5, month: 5 });
+    expect(event).toBeNull();
+  });
+});
+

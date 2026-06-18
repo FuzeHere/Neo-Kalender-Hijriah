@@ -1,19 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap');
 
 :root {
-  --primary: #10b981;
-  --primary-dark: #059669;
-  --primary-light: #d1fae5;
-  --bg-color: #0f172a;
-  --surface: #1e293b;
-  --surface-hover: #334155;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --border: #334155;
-  --accent: #f59e0b;
+  --primary: #9381ff;
+  --primary-dark: #7b68ee;
+  --primary-light: #b8b8ff;
+  --secondary: #b8b8ff;
+  --bg-color: #f8f7ff;
+  --surface: #ffffff;
+  --surface-hover: #f0eeff;
+  --text-main: #2d2d3f;
+  --text-muted: #7c7c9a;
+  --border: #e8e6f0;
+  --accent: #fbbf24;
+  --accent-dark: #f59e0b;
   --danger: #ef4444;
-  --glass-bg: rgba(30, 41, 59, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --event: #ff6b6b;
+  --success: #34d399;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(147, 129, 255, 0.15);
+  --shadow-sm: 0 1px 3px rgba(147, 129, 255, 0.08);
+  --shadow-md: 0 4px 20px rgba(147, 129, 255, 0.1);
+  --shadow-lg: 0 12px 40px rgba(147, 129, 255, 0.15);
+  --shadow-xl: 0 25px 50px -12px rgba(147, 129, 255, 0.2);
 }
 
 body {
@@ -24,8 +32,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: 
-    radial-gradient(at 0% 0%, hsla(160, 100%, 25%, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(220, 100%, 25%, 0.15) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(147, 129, 255, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(184, 184, 255, 0.12) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(147, 129, 255, 0.04) 0px, transparent 70%);
   background-attachment: fixed;
   min-height: 100vh;
 }
@@ -41,4 +50,22 @@ h1, h2, h3, h4, h5, h6 {
 
 p {
   margin: 0 0 1rem 0;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
